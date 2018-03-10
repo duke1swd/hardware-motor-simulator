@@ -324,7 +324,7 @@ static void sim_main() {
 		last_main_log_time = loop_time;
 	}
 
-	chamber_p = chamber_pct * (MAX_MAIN_PRESSURE - SENSOR_ZERO) / 100 + SENSOR_ZERO;
+	chamber_p = (long)chamber_pct * (long)(MAX_MAIN_PRESSURE - SENSOR_ZERO) / 100UL + SENSOR_ZERO;
 	dac_set10(DAC_MAIN, chamber_p);
 }
 
