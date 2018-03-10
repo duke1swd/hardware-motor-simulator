@@ -265,11 +265,11 @@ static void servo_slew() {
 
 static int old_chamber_pct;
 static unsigned long last_main_log_time;
+static bool fuel_gone;
 
 static void sim_main() {
 	int chamber_pct;
 	//int p;
-	extern void log_review_state(bool);
 
 	// avoid running too often
 	if (loop_time < sim_main_next_update)
@@ -305,13 +305,16 @@ static void sim_main() {
 	n2o_fractional_consumed %= 100;
 
 	if (n2o_level < 0 || ipa_level < 0) {
-		do_exit();
-		state_new(log_review_state);
-		return;
+		if (!fuel_gone) {
+			fuel_gone = true;
+			log(LOG_FUEL_GONE, 0);
+		}
+		chamber_pct = 0;
+	} else {
+		chamber_pct = (CHAMBER_EFF * min(n2o_pct, ipa_pct)) / 100;
+		chamber_pct = min(chamber_pct, CHAMBER_MAX_PCT);
 	}
 
-	chamber_pct = (CHAMBER_EFF * min(n2o_pct, ipa_pct)) / 100;
-	chamber_pct = max(chamber_pct, CHAMBER_MAX_PCT);
 	if (chamber_pct == old_chamber_pct)
 		return;
 	old_chamber_pct = chamber_pct;
@@ -328,7 +331,11 @@ static void sim_main() {
 /*
  * This state handles running the test.
  */
+static unsigned long end_time;
+
 void running_state(bool first_time) {
+	extern void log_review_state(bool);
+
 	if (input_action_button) {
 		do_exit();
 		return;
@@ -339,7 +346,8 @@ void running_state(bool first_time) {
 		test_start_time = loop_time;
 		ig_pressure_good = false;
 		ig_pressure_has_been_good = false;
-		sim_ig_output = NO_PRESSURE;	// no pressure, but sensor present.
+		sim_ig_output = NO_PRESSURE;		// no pressure, but sensor present.
+		sim_ig_output_target = NO_PRESSURE;	// no pressure, but sensor present.
 		sim_ig_next_update = 0;
 
 		n2o_level = PROPELLANT_LOAD;
@@ -354,6 +362,8 @@ void running_state(bool first_time) {
 		old_chamber_pct = 0;
 		chamber_p = NO_PRESSURE;
 		sim_ig_increment = 150;	//igniter pressure normally changes rapidly
+		fuel_gone = false;
+		end_time = 0;
 	}
 
 	if (fr_sim_ig)
@@ -362,4 +372,13 @@ void running_state(bool first_time) {
 	monitor_ig();
 
 	sim_main();
+
+	if (fuel_gone && end_time == 0)
+		end_time = loop_time + 2000UL;
+	
+	if (fuel_gone && loop_time >= end_time) {
+		log(LOG_MAIN_DONE, 0);
+		do_exit();
+		state_new(log_review_state);
+	}
 }

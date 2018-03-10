@@ -16,7 +16,8 @@ const char ss_10[] PROGMEM = "MN N2O Chg";
 const char ss_11[] PROGMEM = "MN IPA Chg";
 const char ss_12[] PROGMEM = "MAIN done";
 const char ss_13[] PROGMEM = "MAIN PCT";
-const char ss_14[] PROGMEM = "TIME Rollo";
+const char ss_14[] PROGMEM = "FUEL GONE";
+const char ss_15[] PROGMEM = "TIME Rollo";
 
 const char * const op_codes_short[] PROGMEM = {
 		ss_0,
@@ -34,6 +35,7 @@ const char * const op_codes_short[] PROGMEM = {
 		ss_12,
 		ss_13,
 		ss_14,
+		ss_15,
 };
 
 // long names, 20 chars max
@@ -52,7 +54,8 @@ const char ls_10[] PROGMEM = "MAIN N2O Servo";
 const char ls_11[] PROGMEM = "MAIN IPA Servo";
 const char ls_12[] PROGMEM = "MAIN DONE";
 const char ls_13[] PROGMEM = "MAIN Chamber PCT";
-const char ls_14[] PROGMEM = "TIME Rollover";
+const char ls_14[] PROGMEM = "MAIN Fuel Gone";
+const char ls_15[] PROGMEM = "TIME Rollover";
 
 const char * const op_codes_long[] PROGMEM = {
 		ls_0,
@@ -68,4 +71,7 @@ const char * const op_codes_long[] PROGMEM = {
 		ls_10,
 		ls_11,
 		ls_12,
+		ls_13,
+		ls_14,
+		ls_15,
 };

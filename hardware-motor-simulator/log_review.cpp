@@ -25,9 +25,10 @@ static void i_draw() {
 			p = log_tos_seqn();
 		else
 			p = log_tos_short(i + lr_min);
-		if (*p)
+		if (*p) {
+			p[21] = '\0';
 			lcd.print(p);
-		else {
+		} else {
 			buffer_zip_short();
 			lcd.print(buffer);
 		}
@@ -35,9 +36,13 @@ static void i_draw() {
 }
 
 void log_review_state(bool first_time) {
+	bool draw_screen;
+
+	draw_screen = false;
 
 	if (first_time) {
 		lr_min = -1;
+		draw_screen = true;
 	}
 
 	if (input_action_button)  {
@@ -50,19 +55,19 @@ void log_review_state(bool first_time) {
 		input_scroll_up = false;
 		if (lr_min > -1) {
 			lr_min--;
-			first_time = true;
+			draw_screen = true;
 		}
 	}
 
 	if (input_scroll_down) {
 		input_scroll_down = false;
-		if (*log_tos_short(lr_min+3)) {
+		if (*log_tos_short(lr_min+4)) {
 			lr_min++;
-			first_time = true;
+			draw_screen = true;
 		}
 	}
 
-	if (first_time) {
+	if (draw_screen) {
 		output_led = LED_ONE_SHOT;
 		i_draw();
 	}

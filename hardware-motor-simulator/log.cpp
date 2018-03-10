@@ -45,6 +45,7 @@ void log_init() {
 	log_sequence_increment = 1;
 
 	n_log_entries = EEPROM.read(LOG_CHECK_BYTE_1);
+	/*xxx*/Serial.print("Read "); Serial.print(n_log_entries); Serial.print(" from EEPROM");
 	cb2 = EEPROM.read(LOG_CHECK_BYTE_2);
 
 	// check if log in eeprom is valid.
@@ -173,21 +174,32 @@ char *log_tos_seqn() {
 	buffer[6] = ' ';
 	buffer_print_n_i(7, log_sequence_number);
 
-	buffer[12] = '\0';
+	//buffer[12] = '\0';
 	return buffer;
 }
 
 /*
  * Put the timestamp into the long string
+ * Puts "END" if off the end.
+ *
+ * Returns true of nothing to print, else false.
  */
-static unsigned char i_log_tos(unsigned char entry) {
+static bool i_log_tos(unsigned char entry) {
 	unsigned char bias;
 	unsigned char i;
 
 	buffer_zip();
-	if (entry >= n_log_entries) {
+
+	if (entry == n_log_entries) {
+		buffer[0] = 'E';
+		buffer[1] = 'N';
+		buffer[2] = 'D';
+		return true;
+	}
+
+	if (entry > n_log_entries) {
 		buffer[0] = '\0';
-		return 1;
+		return true;
 	}
 
 	bias = 0;
@@ -201,7 +213,7 @@ static unsigned char i_log_tos(unsigned char entry) {
 		buffer[0] = '0' + bias;
 	buffer_print_n_i(1, log_in_memory[entry].timestamp + (bias? 10000: 0));
 
-	return 0;
+	return false;
 }
 
 /*
@@ -228,15 +240,18 @@ static void i_opcode_print(const char * const table[], unsigned char op) {
  */
 char *log_tos_short(unsigned char entry) {
 	unsigned char p;
+	bool f;
 
-	if (i_log_tos(entry))
-		return buffer;
+	f = i_log_tos(entry);
 	buffer[20] = '\0';
+
+	if (f)
+		return buffer;
 
 	i_opcode_print(op_codes_short, (log_in_memory[entry].log_op) & ~LOG_LEVEL_MASK);
 
 	p = log_in_memory[entry].log_param;
-/*xxx*/Serial.print("op = "); Serial.print((int)(log_in_memory[entry].log_op)); Serial.print(" p = ");Serial.print((int)(p)); Serial.print("\n");
+/*xxx*/ //Serial.print("op = "); Serial.print((int)(log_in_memory[entry].log_op)); Serial.print(" p = ");Serial.print((int)(p)); Serial.print("\n");
 	if (p)
 		buffer_print_n_c(17, p);
 
@@ -253,10 +268,13 @@ char *log_tos_short(unsigned char entry) {
  */
 char *log_tos_long(unsigned char entry) {
 	unsigned char p;
+	bool f;
 
-	if (i_log_tos(entry))
-		return buffer;
+	f = i_log_tos(entry);
 	buffer[30] = '\0';
+
+	if (f)
+		return buffer;
 
 	i_opcode_print(op_codes_long, (log_in_memory[entry].log_op) & ~LOG_LEVEL_MASK);
 

@@ -199,7 +199,7 @@ static void i_spark_sense() {
 	bool b;
 
 	input_spark_sense_A = analogRead(PIN_SPARK);
-	b = (input_spark_sense_A > 100 && input_spark_sense_A < 900);
+	b = (input_spark_sense_A > 50 && input_spark_sense_A < 1024-50);
 
 	if (b && !input_spark_sense)
 		log(LOG_SPARK_FIRST, 0);

@@ -6,6 +6,7 @@
 #include "Arduino.h"
 #include "io_ref.h"
 #include "pins.h"
+#include "log.h"
 
 #define	SERVO_MIN	544UL
 #define	SERVO_MAX	2400UL
@@ -104,7 +105,7 @@ static void n2o_isr() {
 	unsigned char c;
 
 	// on rising edge record time and mark state
-	if (digitalRead(PIN_MAIN_IPA)) {
+	if (digitalRead(PIN_MAIN_N2O)) {
 		n2o_raise_time = micros();
 		n2o_valid = true;
 		return;
@@ -147,6 +148,9 @@ static void n2o_isr() {
 	input_n2o_servo_degrees = ((w - SERVO_MIN) * 180UL) / (SERVO_MAX-SERVO_MIN);
 }
 
+static unsigned char old_ipa_degrees;
+static unsigned char old_n2o_degrees;
+
 void servo_setup() {
 	pinMode(PIN_MAIN_IPA, INPUT);
 	pinMode(PIN_MAIN_N2O, INPUT);
@@ -158,6 +162,8 @@ void servo_setup() {
 	n2o_last_last_valid_short = 0;
 	ipa_waiting = true;
 	n2o_waiting = true;
+	old_ipa_degrees = DEGREES_ERROR;
+	old_n2o_degrees = DEGREES_ERROR;
 	attachInterrupt(digitalPinToInterrupt(PIN_MAIN_IPA), ipa_isr, CHANGE);
 	attachInterrupt(digitalPinToInterrupt(PIN_MAIN_N2O), n2o_isr, CHANGE);
 }
@@ -183,6 +189,12 @@ unsigned char servo_read_ipa() {
 	}
 
 	d = input_ipa_servo_degrees;
+
+	if (abs(d - old_ipa_degrees) > 1) {
+		log(LOG_MAIN_IPA_CHANGE, d);
+		old_ipa_degrees = d;
+	}
+
 	if (d == DEGREES_ERROR)
 		return -2;
 
@@ -205,6 +217,12 @@ unsigned char servo_read_n2o() {
 	}
 
 	d = input_n2o_servo_degrees;
+
+	if (abs(d - old_n2o_degrees) > 1) {
+		log(LOG_MAIN_N2O_CHANGE, d);
+		old_n2o_degrees = d;
+	}
+
 	if (d == DEGREES_ERROR)
 		return -2;
 

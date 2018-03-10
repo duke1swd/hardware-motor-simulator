@@ -13,9 +13,9 @@ void buffer_zip() {
 void buffer_zip_short() {
 	unsigned char i;
 
-	for (i = 0; i < BUFFER_LEN_SHORT-1; i++)
+	for (i = 0; i < BUFFER_LEN_SHORT; i++)
 		buffer[i] = ' ';
-	buffer[BUFFER_LEN_SHORT-1] = '\0';
+	buffer[BUFFER_LEN_SHORT] = '\0';
 }
 
 /*
