@@ -1,1 +1,2 @@
 Change log code so buffer pointer is not passed around but assumed to be BUFFER.
+Change the log code so that parameter value of '0' is a legal value and gets printed.

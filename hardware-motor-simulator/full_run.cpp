@@ -34,11 +34,16 @@ extern void running_state(bool);
 //chamber behavior parameters: permit things like no/low pressure on main chamber startup,
 //or failure to reach full pressure when main valves open fully
 #define CHAMBER_EFF		100		// relative pressure
+//#define CHAMBER_EFF		5		// doesn't light -- cold flow
 #define CHAMBER_MAX_PCT		100		// max pressure percentage
 
 //igniter failure modes
 #define IG_LIGHT		true
 #define IG_STAY_LIT		true
+
+// transducer fault
+#define	PRESSURE_FAULT		2		// 0 = none, 1 = igniter, 2 = main
+#define	PRESSURE_FAULT_TIME	1000		// milliseconds after start
 
 bool fr_sim_ig;		// true if we are simulating the igniter pressure sensor
 int chamber_p;		// simulated chamber pressure
@@ -61,6 +66,7 @@ static void do_exit() {
 void full_run_state(bool first_time) {
 
 	if (first_time) {
+		test_start_time = 0;
 		log_reset();
 		log_enabled = true;
 		lcd.clear();
@@ -162,6 +168,12 @@ static void sim_ig() {
 			sim_ig_output = sim_ig_output_target;
 		}
 	}
+#if PRESSURE_FAULT == 1
+	if (test_start_time > 0 && loop_time - test_start_time > PRESSURE_FAULT_TIME) {
+		sim_ig_output = 0;
+		sim_noise = 0;
+	}
+#endif
 	dac_set10(DAC_IG, sim_ig_output + sim_noise);
 
 	// If any of the valves are off, kill the ig pressure
@@ -314,6 +326,12 @@ static void sim_main() {
 		chamber_pct = (CHAMBER_EFF * min(n2o_pct, ipa_pct)) / 100;
 		chamber_pct = min(chamber_pct, CHAMBER_MAX_PCT);
 	}
+#if PRESSURE_FAULT == 2
+	if (test_start_time > 0 && loop_time - test_start_time > PRESSURE_FAULT_TIME) {
+		dac_set10(DAC_MAIN, 0);
+		return;
+	}
+#endif
 
 	if (chamber_pct == old_chamber_pct)
 		return;
