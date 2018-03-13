@@ -42,7 +42,7 @@ extern void running_state(bool);
 #define IG_STAY_LIT		true
 
 // transducer fault
-#define	PRESSURE_FAULT		2		// 0 = none, 1 = igniter, 2 = main
+#define	PRESSURE_FAULT		0		// 0 = none, 1 = igniter, 2 = main
 #define	PRESSURE_FAULT_TIME	1000		// milliseconds after start
 
 bool fr_sim_ig;		// true if we are simulating the igniter pressure sensor
