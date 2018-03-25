@@ -21,3 +21,6 @@
 
 // 1024 / 10 + 200 * (8/10 * 1024) / 500
 #define	MAX_MAIN_PRESSURE	430		// approx 200 PSI
+
+// 10 * (8/10 * 1024) / 500
+#define	PRESSURE_FAULT_DELTA	17		// about 10 PSI 

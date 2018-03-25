@@ -45,6 +45,10 @@ extern void running_state(bool);
 #define	PRESSURE_FAULT		0		// 0 = none, 1 = igniter, 2 = main
 #define	PRESSURE_FAULT_TIME	1000		// milliseconds after start
 
+// ig pressure too low fault
+#define	IG_TOO_LOW_FAULT	0		// 0 = none, 1 = fault
+#define	IG_TOO_LOW_FAULT_TIME	1200		// milliseconds after start
+
 bool fr_sim_ig;		// true if we are simulating the igniter pressure sensor
 int chamber_p;		// simulated chamber pressure
 
@@ -204,6 +208,15 @@ static void sim_ig() {
 
 	if (sim_ig_output_target < chamber_p)
 		sim_ig_output_target = chamber_p;
+
+#if IG_TOO_LOW_FAULT > 0
+	if (test_start_time > 0 && loop_time - test_start_time > IG_TOO_LOW_FAULT_TIME) {
+		sim_ig_output_target = chamber_p - PRESSURE_FAULT_DELTA;
+		if (sim_ig_output_target < NO_PRESSURE)
+			sim_ig_output_target = NO_PRESSURE;
+	}
+#endif
+
 }
 
 /*
