@@ -79,7 +79,7 @@ void dac_off(int dac) {
 bool dac_ig_press_present()
 {
 	dac_off(DAC_IG);
-	return (analogRead(PIN_IG_PRESS) < 100? false: true);
+	return (analogRead(PIN_IG_PRESS) < 90? false: true);
 }
 
 /*
