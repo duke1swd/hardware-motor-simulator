@@ -32,6 +32,7 @@ const char  m_3[] PROGMEM = "Spark Test";
 const char  m_4[] PROGMEM = "IG Valve Test";
 const char  m_5[] PROGMEM = "Main Valve Test";
 const char  m_6[] PROGMEM = "Ig Pressure Sensor";
+const char  m_7[] PROGMEM = "Main Wave Generatr";
 
 const char * const menu_table[] PROGMEM = {
 		m_0,
@@ -41,6 +42,7 @@ const char * const menu_table[] PROGMEM = {
 		m_4,
 		m_5,
 		m_6,
+		m_7,
 };
 
 /*
@@ -53,6 +55,7 @@ extern void spark_test_state(bool);
 extern void ig_valve_test_state(bool);
 extern void main_valve_test_state(bool);
 extern void ig_press_test_state(bool);
+extern void main_wave_generator_state(bool);
 
 void (*menu_state_functions[])(bool) = {
 	full_run_state,
@@ -62,9 +65,10 @@ void (*menu_state_functions[])(bool) = {
 	ig_valve_test_state,
 	main_valve_test_state,
 	ig_press_test_state,
+	main_wave_generator_state,
 };
 
-#define	N_MENU_ITEMS	7
+#define	N_MENU_ITEMS	8
 
 static unsigned char menu_selection;	// which is the current menu item?
 
