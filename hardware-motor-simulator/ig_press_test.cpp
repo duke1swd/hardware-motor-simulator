@@ -18,7 +18,7 @@ extern LiquidCrystal lcd;
 static unsigned long next_update_time;
 extern unsigned long loop_time;
 static unsigned long const update_period = 100;
-static long previous_display;
+static int previous_ig_press;
 
 void ig_press_test_state(bool first_time) {
 	long c;
@@ -32,7 +32,7 @@ void ig_press_test_state(bool first_time) {
 		lcd.setCursor(0, 3);
 		lcd.print("Scaled Value:");
 		next_update_time = 0;
-		previous_display = -2;
+		previous_ig_press = -2;
 	}
 	
 	// Exit the test when the action button is pressed.
@@ -59,21 +59,21 @@ void ig_press_test_state(bool first_time) {
 	lcd.setCursor(14, 2);
 	if (dac_ig_press_present()) {
 		lcd.print(input_ig_press);
+		if (input_ig_press != previous_ig_press) {
+			previous_ig_press = input_ig_press;
 
-		c = input_ig_press - SENSOR_ZERO;
-		if (c < 0)
-			c = 0;
-		c = (c * (unsigned long)PSI_RANGE * 16L) / ((unsigned long)(SENSOR_MAX-SENSOR_ZERO));
-		c /= 16L;
-		if (c != previous_display) {
+			c = input_ig_press - SENSOR_ZERO;
+			//if (c < 0)
+				//c = 0;
+			c = (c * (long)PSI_RANGE * PSI_RANGE) / ((long)(SENSOR_MAX-SENSOR_ZERO));
+
 			lcd.setCursor(14, 3);
 			lcd.print(c);
-			previous_display = c;
 		}
 	} else {
-		if (previous_display != -1) {
+		if (previous_ig_press != -1) {
 			lcd.print("N/C");
-			previous_display = -1;
+			previous_ig_press = -1;
 		}
 	}
 }
