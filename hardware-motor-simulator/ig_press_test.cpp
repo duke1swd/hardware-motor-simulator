@@ -33,6 +33,10 @@ void ig_press_test_state(bool first_time) {
 		lcd.print("Scaled Value:");
 		next_update_time = 0;
 		previous_ig_press = -2;
+
+		// Set up erase buffer
+		buffer_zip_short();
+		buffer[6] = '\0';
 	}
 	
 	// Exit the test when the action button is pressed.
@@ -49,30 +53,32 @@ void ig_press_test_state(bool first_time) {
 	// schedule next update.
 	next_update_time = loop_time + update_period;
 
-	buffer_zip();
-	buffer[6] = '\0';
-	lcd.setCursor(14, 2);
-	lcd.print(buffer);
-	lcd.setCursor(14, 3);
-	lcd.print(buffer);
-
-	lcd.setCursor(14, 2);
 	if (dac_ig_press_present()) {
-		lcd.print(input_ig_press);
+		output_led = LED_ON;
 		if (input_ig_press != previous_ig_press) {
+			lcd.setCursor(14, 2);
+			lcd.print(buffer);	// erase the old value
+			lcd.setCursor(14, 2);
+			lcd.print(input_ig_press);// print the new raw value
 			previous_ig_press = input_ig_press;
 
 			c = input_ig_press - SENSOR_ZERO;
 			//if (c < 0)
 				//c = 0;
-			c = (c * (long)PSI_RANGE * PSI_RANGE) / ((long)(SENSOR_MAX-SENSOR_ZERO));
+			c = (c * (long)PSI_RANGE) / ((long)(SENSOR_MAX-SENSOR_ZERO));
 
 			lcd.setCursor(14, 3);
-			lcd.print(c);
+			lcd.print(buffer);	// erase the old value
+			lcd.setCursor(14, 3);
+			lcd.print(c);		// print the new value
 		}
 	} else {
+		output_led = LED_OFF;
 		if (previous_ig_press != -1) {
-			lcd.print("N/C");
+			lcd.setCursor(14, 2);
+			lcd.print("N/C   ");
+			lcd.setCursor(14, 3);
+			lcd.print("N/C   ");
 			previous_ig_press = -1;
 		}
 	}
