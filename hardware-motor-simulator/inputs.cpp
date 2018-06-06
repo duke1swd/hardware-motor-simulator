@@ -198,7 +198,7 @@ static void i_ig_press() {
 	v = analogRead(PIN_IG_PRESS_SIM);
 	t = v - input_ig_press_from_dac;
 	if (t >= hysteresis || t <= -hysteresis) {
-		input_ig_press = v;
+		input_ig_press_from_dac = v;
 	}
 }
 
