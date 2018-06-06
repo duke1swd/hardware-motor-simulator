@@ -201,6 +201,14 @@ unsigned char servo_read_ipa() {
 	return d;
 }
 
+unsigned char servo_read_ipa_old() {
+
+	if (input_ipa_servo_degrees == DEGREES_ERROR)
+		return -2;
+
+	return input_ipa_servo_degrees;
+}
+
 unsigned char servo_read_n2o() {
 	unsigned char d;
 
@@ -227,4 +235,12 @@ unsigned char servo_read_n2o() {
 		return -2;
 
 	return d;
+}
+
+unsigned char servo_read_n2o_old() {
+
+	if (input_n2o_servo_degrees == DEGREES_ERROR)
+		return -2;
+
+	return input_n2o_servo_degrees;
 }

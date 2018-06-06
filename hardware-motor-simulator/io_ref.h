@@ -13,6 +13,7 @@ extern int  input_spark_sense_A;	// analog value.  Used only in test routines.
 // These are the analog input values
 extern int  input_main_press;
 extern int  input_ig_press;
+extern int  input_ig_press_from_dac;
 extern volatile int input_ipa_servo;		// pulse width in microseconds.  disable interrupt to read
 extern volatile int input_n2o_servo;		// pulse width in microseconds.  disable interrupt to read
 
@@ -28,3 +29,5 @@ extern unsigned char output_led;
 
 extern unsigned char servo_read_n2o();	// returns -1, -2 or servo angle in degrees.
 extern unsigned char servo_read_ipa();	// returns -1, -2 or servo angle in degrees.
+extern unsigned char servo_read_n2o_old();	// returns -1, -2 or servo angle in degrees.
+extern unsigned char servo_read_ipa_old();	// returns -1, -2 or servo angle in degrees.

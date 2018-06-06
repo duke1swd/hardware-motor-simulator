@@ -61,6 +61,7 @@ int  input_spark_sense_A;	// analog value.  Used only in test routines.
 // These are the analog input values.  They are set here only.
 int  input_main_press;
 int  input_ig_press;
+int  input_ig_press_from_dac;
 
 // Action button variables
 static bool action_button_debounce;
@@ -187,11 +188,17 @@ static void i_main_press() {
 static void i_ig_press() {
 	int v, t;
 
-	v = analogRead(PIN_IG_PRESS);
+	v = analogRead(PIN_IG_PRESS_REAL);
 	t = v - input_ig_press;
 	if (t >= hysteresis || t <= -hysteresis) {
 		input_ig_press = v;
 		log(LOG_IG_PRESSURE_CHANGE, 0xff & (v >> 2));
+	}
+
+	v = analogRead(PIN_IG_PRESS_SIM);
+	t = v - input_ig_press_from_dac;
+	if (t >= hysteresis || t <= -hysteresis) {
+		input_ig_press = v;
 	}
 }
 
@@ -230,8 +237,11 @@ void input_setup() {
 	pinMode(PIN_MAIN_PRESS, INPUT);
 	input_main_press = 0;
 
-	pinMode(PIN_IG_PRESS, INPUT);
+	pinMode(PIN_IG_PRESS_REAL, INPUT);
 	input_ig_press = 0;
+
+	pinMode(PIN_IG_PRESS_SIM, INPUT);
+	input_ig_press_from_dac = 0;
 
 	pinMode(PIN_SPARK, INPUT);
 	input_spark_sense = 0;

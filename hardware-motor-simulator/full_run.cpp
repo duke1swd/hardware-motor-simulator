@@ -97,8 +97,10 @@ void full_run_state(bool first_time) {
 		if (fr_sim_ig) {
 			lcd.print("Simulated Ignitor");
 			dac_set10(DAC_IG, NO_PRESSURE);
-		} else
+		} else {
 			lcd.print("Real Igniter     ");
+			dac_set10(DAC_IG, input_ig_press);
+		}
 	}
 
 	if (input_ig_valve_ipa_level || input_ig_valve_n2o_level || input_spark_sense)
@@ -121,7 +123,13 @@ static unsigned long ig_good_time;		// Time when we think the igniter should fir
 static void monitor_ig() {
 	bool b;
 
-	b = (input_ig_press >= IG_PRESS_GOOD);
+	if (fr_sim_ig)
+		b = (input_ig_press_from_dac >= IG_PRESS_GOOD);
+	else {
+		dac_set10(DAC_IG, max(input_ig_press, chamber_p));
+		b = (input_ig_press >= IG_PRESS_GOOD);
+	}
+
 	if (b && !ig_pressure_has_been_good) {
 		log(LOG_IG_PRESSURE_GOOD_1, 0);
 		ig_pressure_has_been_good = true;
@@ -250,6 +258,14 @@ static int n2o_fractional_consumed;
 
 static void servo_slew_init() {
 	last_servo_update_time = loop_time;
+
+	ipa_servo_pos = servo_read_ipa_old();
+	if (ipa_servo_pos < 0)
+		ipa_servo_pos = IPA_SERVO_MIN;
+
+	n2o_servo_pos = servo_read_n2o_old();
+	if (n2o_servo_pos < 0)
+		n2o_servo_pos = IPA_SERVO_MIN;
 }
 
 // compute the simulated servo positions.
@@ -322,7 +338,7 @@ static void sim_main() {
 		n2o_pct = 100;
 	else {
 		n2o_pct = 100 * (n2o_servo_pos - N2O_SERVO_MIN) /
-			(IPA_SERVO_MAX - IPA_SERVO_MIN);
+			(N2O_SERVO_MAX - N2O_SERVO_MIN);
 	}
 
 	n2o_fractional_consumed += n2o_pct;
