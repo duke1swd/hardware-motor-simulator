@@ -13,7 +13,6 @@ extern int  input_spark_sense_A;	// analog value.  Used only in test routines.
 // These are the analog input values
 extern int  input_main_press;
 extern int  input_ig_press;
-extern int  input_ig_press_from_dac;
 extern volatile int input_ipa_servo;		// pulse width in microseconds.  disable interrupt to read
 extern volatile int input_n2o_servo;		// pulse width in microseconds.  disable interrupt to read
 

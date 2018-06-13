@@ -10,6 +10,7 @@
 #include "log.h"
 #include "dac.h"
 #include "pressure.h"
+#include "pins.h"
 
 // amount of noise we put on simulated pressure traces.
 // Should be smaller than hysteresis value (3) in inputs.cpp
@@ -119,15 +120,25 @@ static bool ig_pressure_good;
 static bool ig_pressure_has_been_good;
 static unsigned long ig_pressure_start;
 static unsigned long ig_good_time;		// Time when we think the igniter should fire.
+static unsigned long sim_ig_next_update;
+static const unsigned long sim_ig_interval = 1;
+static int sim_ig_output;
+static int sim_ig_increment;
+static int sim_ig_output_target;
+static int sim_noise;
 
 static void monitor_ig() {
 	bool b;
+	int t;
 
 	if (fr_sim_ig)
-		b = (input_ig_press_from_dac >= IG_PRESS_GOOD);
+		b = (sim_ig_output >= IG_PRESS_GOOD);
 	else {
-		dac_set10(DAC_IG, max(input_ig_press, chamber_p));
-		b = (input_ig_press >= IG_PRESS_GOOD);
+		// copy pressure sensor to output, clipped by chamber pressure
+		t = analogRead(PIN_IG_PRESS_REAL);
+		dac_set10(DAC_IG, max(t, chamber_p));
+
+		b = (max(input_ig_press, chamber_p) >= IG_PRESS_GOOD);
 	}
 
 	if (b && !ig_pressure_has_been_good) {
@@ -144,12 +155,6 @@ static void monitor_ig() {
 /*
  * Simulate the ingiter.  We do this every millisecond.
  */
-static unsigned long sim_ig_next_update;
-static const unsigned long sim_ig_interval = 1;
-static int sim_ig_output;
-static int sim_ig_increment;
-static int sim_ig_output_target;
-static int sim_noise;
 
 //General behavior:
 //Igniter normally lights after a delay if alcohol, nitrous, and spark are present (IG_LIGHT).

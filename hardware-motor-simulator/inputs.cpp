@@ -187,6 +187,7 @@ static void i_main_press() {
 
 static void i_ig_press() {
 	int v, t;
+	volatile bool s = false;
 
 	v = analogRead(PIN_IG_PRESS_REAL);
 	t = v - input_ig_press;
@@ -195,11 +196,8 @@ static void i_ig_press() {
 		log(LOG_IG_PRESSURE_CHANGE, 0xff & (v >> 2));
 	}
 
-	v = analogRead(PIN_IG_PRESS_SIM);
-	t = v - input_ig_press_from_dac;
-	if (t >= hysteresis || t <= -hysteresis) {
-		input_ig_press_from_dac = v;
-	}
+	if (s)
+		analogRead(PIN_IG_PRESS_REAL);
 }
 
 static void i_spark_sense() {
@@ -241,7 +239,7 @@ void input_setup() {
 	input_ig_press = 0;
 
 	pinMode(PIN_IG_PRESS_SIM, INPUT);
-	input_ig_press_from_dac = 0;
+	//input_ig_press_from_dac = 0;
 
 	pinMode(PIN_SPARK, INPUT);
 	input_spark_sense = 0;
