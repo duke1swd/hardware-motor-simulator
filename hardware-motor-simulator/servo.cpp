@@ -25,8 +25,6 @@
  * 	Last valid short variables contain the value (millis()>>4)&0xff
  * 	of last reading.
  */
-volatile int input_ipa_servo;			// pulse width in microseconds
-volatile int input_n2o_servo;			// used for test routine only
 volatile unsigned char input_ipa_servo_degrees;	// servo position in degrees
 volatile unsigned char input_n2o_servo_degrees;
 volatile bool ipa_servo_change;	

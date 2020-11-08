@@ -20,7 +20,6 @@ extern unsigned long loop_time;
 static unsigned long const update_period = 200;
 
 void main_valve_test_state(bool first_time) {
-	int vipa, vn2o;
 	int dipa, dn2o;
 
 	if (first_time) {
@@ -48,11 +47,6 @@ void main_valve_test_state(bool first_time) {
 	// schedule next update.
 	next_update_time = loop_time + update_period;
 
-	// get the data.  Must disable interrupts.
-	noInterrupts();
-	vipa = input_ipa_servo;
-	vn2o = input_n2o_servo;
-	interrupts();
 	dipa = servo_read_ipa();
 	dn2o = servo_read_n2o();
 
@@ -67,7 +61,7 @@ void main_valve_test_state(bool first_time) {
 	else if (dipa == -2)
 		lcd.print("error");
 	else
-		lcd.print(vipa);
+		lcd.print(dipa);
 
 	lcd.setCursor(12, 3);
 	lcd.print(buffer);
@@ -77,5 +71,5 @@ void main_valve_test_state(bool first_time) {
 	else if (dn2o == -2)
 		lcd.print("error");
 	else
-		lcd.print(vn2o);
+		lcd.print(dn2o);
 }
